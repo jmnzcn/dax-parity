@@ -1,0 +1,25 @@
+name: release
+
+# Publishing a GitHub release builds the package and uploads it to PyPI through trusted publishing:
+# PyPI trusts this workflow in this repository, so no token is stored anywhere.
+on:
+  release:
+    types: [published]
+
+jobs:
+  pypi:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: the release tag must match the package version
+        run: |
+          version=$(python -c "import re; print(re.search(r'__version__ = \"(.+)\"', open('src/dax_parity/__init__.py').read())[1])")
+          test "v$version" = "${{ github.event.release.tag_name }}"
+      - run: pip install build && python -m build
+      - uses: pypa/gh-action-pypi-publish@release/v1
