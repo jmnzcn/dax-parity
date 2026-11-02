@@ -5,6 +5,7 @@
   dax-parity record     run the queries in Power BI Desktop and save the results (Windows)
   dax-parity check      compare the saved results with the reference (anywhere, e.g. CI)
   dax-parity run        record, then check
+  dax-parity draft      have Claude write the SQL reference from each measure's description
   dax-parity mutate     break each measure on purpose and count how many breaks the checks catch
   dax-parity validate   validate the model's TMDL with Microsoft's Tabular Object Model
 """
@@ -21,7 +22,8 @@ OK, MISMATCH, ERROR, STALE = 0, 1, 2, 3
 
 
 def _load(args) -> config.Suite:
-    return config.load(Path(args.config))
+    drafts = getattr(args, "drafts", None)
+    return config.load(Path(args.config), Path(drafts) if drafts else None)
 
 
 def cmd_queries(args) -> int:
@@ -95,6 +97,34 @@ def cmd_mutate(args) -> int:
     return OK
 
 
+def cmd_draft(args) -> int:
+    from dax_parity import draft
+
+    suite = config.load(Path(args.config))
+    info = tmdl.measure_info(tmdl.locate(suite.pbip).definition)
+    if args.measure:
+        names = args.measure
+    elif args.all:
+        names = list(info)
+    else:
+        names = [n for n in info if not (suite.measures.get(n) and suite.measures[n].sql)]
+    if not names:
+        print("every measure already has SQL; use --all to draft a second opinion for all of them", file=sys.stderr)
+        return ERROR
+    print(f"drafting {len(names)} measures with {args.model} (the model sees descriptions and data, not DAX)",
+          file=sys.stderr)
+    drafts = draft.run(suite, names, args.model, args.effort, args.workers, samples=not args.no_samples)
+    out = Path(args.out)
+    draft.write(drafts, args.model, out)
+    ok = sum(bool(d.sql and not d.error) for d in drafts)
+    print(f"{ok} of {len(drafts)} measures drafted -> {out}  (about ${draft.cost(drafts, args.model):.2f})")
+    for d in drafts:
+        if not d.sql or d.error:
+            print(f"  {d.measure}: {d.error or d.unclear}")
+    print(f"review it, then: dax-parity check --drafts {out}")
+    return OK
+
+
 def cmd_validate(args) -> int:
     from dax_parity import desktop
 
@@ -163,7 +193,19 @@ def main(argv: list[str] | None = None) -> int:
     c = sub.add_parser("check", help="compare recorded results with the reference")
     c.add_argument("--junit", help="also write a JUnit XML report here")
     c.add_argument("--allow-stale", action="store_true", help="compare even if the results are out of date")
+    c.add_argument("--drafts", help="use the measures in this drafts file instead of the ones in dax-parity.toml")
     c.set_defaults(fn=cmd_check)
+
+    d = sub.add_parser("draft", help="have Claude write the SQL reference from each measure's description")
+    d.add_argument("--measure", action="append", help="draft this measure (repeatable)")
+    d.add_argument("--all", action="store_true", help="draft every measure, even those that already have SQL")
+    d.add_argument("--out", default="dax-parity.drafts.toml")
+    d.add_argument("--model", default="claude-opus-5-5")
+    d.add_argument("--effort", default="medium", choices=["low", "medium", "high", "xhigh", "max"])
+    d.add_argument("--workers", type=int, default=4)
+    d.add_argument("--no-samples", action="store_true",
+                   help="describe only table and column names and types; send no values from the data")
+    d.set_defaults(fn=cmd_draft)
 
     sub.add_parser("validate", help="validate the TMDL with Microsoft's Tabular Object Model").set_defaults(fn=cmd_validate)
 
@@ -175,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:
         return ERROR
     except Exception as e:  # noqa: BLE001 - one clear line instead of a traceback for expected failures
         from dax_parity.desktop import DesktopError
-        if isinstance(e, DesktopError | FileNotFoundError | ValueError):
+        if isinstance(e, DesktopError | FileNotFoundError | ValueError | RuntimeError):
             print(f"error: {e}", file=sys.stderr)
             return ERROR
         raise

@@ -44,9 +44,24 @@ def locate(pbip: Path) -> Project:
     return Project(pbip.resolve(), report, (report / by_path).resolve())
 
 
+@dataclass(frozen=True)
+class MeasureInfo:
+    name: str
+    table: str
+    dax: str
+    description: str
+    format: str
+    folder: str
+
+
 def measures(definition: Path) -> dict[str, str]:
     """Every measure's DAX expression, keyed by measure name."""
-    out: dict[str, str] = {}
+    return {name: info.dax for name, info in measure_info(definition).items()}
+
+
+def measure_info(definition: Path) -> dict[str, MeasureInfo]:
+    """Every measure with its expression, its /// description, format string and display folder."""
+    out: dict[str, MeasureInfo] = {}
     for path in sorted((definition / "tables").glob("*.tmdl")):
         lines = path.read_text(encoding="utf-8-sig").splitlines()
         i = 0
@@ -56,6 +71,10 @@ def measures(definition: Path) -> dict[str, str]:
             if not m:
                 continue
             depth = len(m["indent"])
+            doc, j = [], i - 2
+            while j >= 0 and lines[j].strip().startswith("///"):
+                doc.insert(0, lines[j].strip()[3:].strip())
+                j -= 1
             rest = m["rest"].strip()
             if rest.startswith("```"):  # fenced expression
                 body = [rest[3:]] if rest[3:] else []
@@ -69,7 +88,14 @@ def measures(definition: Path) -> dict[str, str]:
                 while i < len(lines) and (not lines[i].strip() or _depth(lines[i]) > depth + 1):
                     body.append(lines[i])
                     i += 1
-            out[_unquote(m["name"])] = "\n".join(b.strip() for b in body if b.strip())
+            props = {}
+            while i < len(lines) and lines[i].strip() and _depth(lines[i]) == depth + 1 and ":" in lines[i]:
+                key, _, value = lines[i].strip().partition(":")
+                props[key.strip()] = value.strip()
+                i += 1
+            name = _unquote(m["name"])
+            out[name] = MeasureInfo(name, path.stem, "\n".join(b.strip() for b in body if b.strip()),
+                                    " ".join(doc), props.get("formatString", ""), props.get("displayFolder", ""))
     return out
 
 

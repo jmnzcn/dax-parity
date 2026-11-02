@@ -36,6 +36,9 @@ jobs:
         working-directory: examples/recovery-bi
       - run: dax-parity check --junit parity.junit.xml
         working-directory: examples/recovery-bi
+      - name: the same results against the references Claude drafted
+        run: dax-parity check --drafts dax-parity.drafts.toml
+        working-directory: examples/recovery-bi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -208,3 +208,9 @@ def test_recorded_example_matches_its_reference(tmp_path):
     junit = tmp_path / "out.xml"
     assert cli.main(["-c", str(EXAMPLE / "dax-parity.toml"), "check", "--junit", str(junit)]) == cli.OK
     assert ET.parse(junit).getroot().get("failures") == "0"
+
+
+def test_example_matches_the_references_claude_drafted():
+    """Claude wrote these from the measure descriptions without seeing the DAX; they agree on every cell."""
+    toml = str(EXAMPLE / "dax-parity.toml")
+    assert cli.main(["-c", toml, "check", "--drafts", str(EXAMPLE / "dax-parity.drafts.toml")]) == cli.OK

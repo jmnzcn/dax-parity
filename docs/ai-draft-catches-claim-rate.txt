@@ -1,0 +1,31 @@
+recorded with Power BI Desktop (Analysis Services 17.0.93.23) at 2026-11-02T05:49:41Z
+  totals                   1 rows       13 cells      0 mismatches
+  by_category              8 rows      104 cells      0 mismatches
+  by_status                6 rows       78 cells      5 mismatches
+  by_vendor              170 rows     2210 cells      0 mismatches
+  by_vendor_category    1188 rows    15444 cells     51 mismatches
+  by_month                18 rows       36 cells      0 mismatches
+  by_category_month      137 rows      274 cells      0 mismatches
+18159 cells compared, 56 mismatches
+
+by measure:
+  Claim Rate: 56 of 1373 cells (56 blank_vs_zero)
+
+first differences:
+  by_status [EXPIRED] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_status [INSUFFICIENT_EVIDENCE] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_status [ALREADY_RECOVERED] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_status [NOT_CLAIMABLE] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_status [NEEDS_REVIEW] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [GQLO3, CHARGEBACK_LATE_SHIPMENT] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [J620E, UNPAID_INVOICE] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [VEYIC, CHARGEBACK_ASN] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [5UX2W, CHARGEBACK_LATE_SHIPMENT] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [FBDAM, CHARGEBACK_ASN] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [QULYG, CHARGEBACK_ASN] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [1F98O, UNDERPAYMENT] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [I2DPR, UNPAID_INVOICE] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [J620E, CHARGEBACK_LATE_SHIPMENT] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+  by_vendor_category [NGLW2, CHARGEBACK_ASN] Claim Rate: Power BI BLANK, expected 0.0  [blank_vs_zero]
+
+hint (blank_vs_zero): BLANK and 0 differ. If the answer should be 0, add + 0 or COALESCE ( ..., 0 ) to the DAX; if it should be blank, set blank_if_zero = true on the measure.

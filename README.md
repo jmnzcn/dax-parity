@@ -12,8 +12,9 @@ inside Power BI Desktop, the SQL in DuckDB. It compares every measure across eve
 (totals, by product, by customer, by month, by customer and product) and tells you which cells differ
 and why. On the example in this repo that is 18,159 cells in about 30 seconds.
 
-It can also test the tests: `dax-parity mutate` plants small bugs in your measures and reports which
-ones your checks would miss. That's mutation testing, applied to a Power BI model.
+It can also write the reference for you: `dax-parity draft` has Claude write each measure's SQL from
+its description, without ever showing it the DAX. And it can test the tests: `dax-parity mutate`
+plants small bugs in your measures and reports which ones your checks would miss.
 
 ## Why
 
@@ -50,6 +51,46 @@ This is differential testing: two independent implementations of the same thing,
 of inputs. It works because SQL and DAX fail differently. A wrong filter context, a relationship
 going the wrong way, BLANK handling, a `DIVIDE` that hides a zero: SQL doesn't share those mistakes,
 so they show up as differences.
+
+## Let Claude write the reference
+
+Writing the SQL for every measure is the slow part. `dax-parity draft` hands it to Claude, with one
+rule that makes it useful: the model never sees the DAX. It gets each measure's name, its `///`
+description from the model, its format string and folder, and a profile of the data (tables,
+columns, types, the values of small text columns, the FROM clause). It writes the SQL the way an
+analyst would from the business definition, every draft is run in DuckDB on every slice, and any
+error goes back to the model to fix. A reference written by reading the DAX would copy its mistakes;
+one written from the description only agrees with the DAX if both mean the same thing.
+
+On the example, Claude drafted 13 of the 14 measures in 25 seconds for about $0.29
+([the drafts](examples/recovery-bi/dax-parity.drafts.toml)). The fourteenth, a running total, it
+declined: it said, correctly, that it can't be one aggregate per group. Then:
+
+- Against the correct model, the drafts agree with Power BI on all 18,159 cells. That includes
+  `Urgent Claims`, which Claude wrote as `DaysLeft <= 30` instead of using the `Urgent` flag the DAX
+  uses, so the comparison also confirmed that the flag means what its description says.
+- Against the model with the `Claim Rate` bug, the drafts find the same 56 cells as the hand-written
+  reference, all `blank_vs_zero`, without anyone writing a line of SQL
+  ([output](docs/ai-draft-catches-claim-rate.txt)).
+
+```bash
+pip install "dax-parity[ai]"
+export ANTHROPIC_API_KEY=...
+dax-parity draft                      # measures without SQL in dax-parity.toml
+dax-parity draft --all                # a second opinion on every measure
+dax-parity check --drafts dax-parity.drafts.toml
+```
+
+Each draft comes with the assumptions the model had to make and anything it found unclear, written as
+comments above the measure. Those notes are worth reading on their own: on the example it pointed out
+that several "USD" measures sum a column whose rows have six currencies, which is only right because
+the source already converted them. When a draft and the DAX disagree, either the DAX is wrong or the
+description is; both are worth knowing. A person reviews the drafts before they become the reference.
+
+What is sent to the API: measure names, descriptions, format strings, table and column names and
+types, row counts, minimum and maximum of numeric and date columns, and up to 25 distinct values of
+text columns that have that few. With `--no-samples`, only names, types and row counts. No DAX and no
+rows are sent.
 
 ## Mutation testing: are your checks good enough?
 
@@ -167,6 +208,7 @@ dax-parity check           # anywhere; --junit report.xml for CI test reports
 dax-parity run             # both
 dax-parity queries         # print the DAX it will run
 dax-parity validate        # check the TMDL with Microsoft's Tabular Object Model
+dax-parity draft           # Claude writes the SQL from each measure's description (needs [ai])
 dax-parity mutate          # Windows: break each measure on purpose, see what the checks catch
 ```
 

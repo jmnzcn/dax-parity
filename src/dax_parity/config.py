@@ -77,12 +77,20 @@ class Suite:
     equivalent: dict[str, str] = field(default_factory=dict)  # mutant id -> why it can't change any result
 
 
-def load(path: Path) -> Suite:
+def load(path: Path, drafts: Path | None = None) -> Suite:
+    """Read dax-parity.toml. With drafts, each drafted measure that has SQL replaces the one in the file."""
     path = path.resolve()
     if not path.exists():
         raise ConfigError(f"{path} not found (run `dax-parity init` to create one)")
     raw = tomllib.loads(path.read_text(encoding="utf-8"))
     root = path.parent
+    if drafts is not None:
+        if not drafts.exists():
+            raise ConfigError(f"{drafts} not found (run `dax-parity draft` first)")
+        drafted = {m["name"]: m for m in tomllib.loads(drafts.read_text(encoding="utf-8")).get("measure", [])
+                   if m.get("sql")}
+        own = [drafted.pop(m["name"], m) for m in raw.get("measure", [])]
+        raw["measure"] = own + list(drafted.values())
 
     def rel(p: str) -> Path:
         return (root / p.replace("{root}", str(root))).resolve()

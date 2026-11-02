@@ -1,0 +1,131 @@
+# Drafted by claude-opus-5-5 from each measure's description, without seeing its DAX.
+# Review every entry. Compare with: dax-parity check --drafts <this file>
+
+# assumption: Counts every finding row regardless of Status, Category, RefType or MatchTier, since 'whatever the outcome' implies no filtering.
+# assumption: Each Findings row is one decided finding (FindingKey is unique), so COUNT(*) equals the count of distinct FindingKey.
+[[measure]]
+name = "Total Findings"
+sql = '''COUNT(*)'''
+compare = "exact"
+blank_if_zero = true
+
+# assumption: 'Can be disputed now, with evidence' maps to Status = 'CLAIMABLE'. NEEDS_REVIEW and INSUFFICIENT_EVIDENCE are excluded.
+# assumption: Rows are counted one per finding, since FindingKey is unique.
+# assumption: No additional filter on DaysLeft or Urgent is applied, because CLAIMABLE already implies the dispute window is open.
+[[measure]]
+name = "Claims"
+sql = '''COUNT(*) FILTER (WHERE Findings.Status = 'CLAIMABLE')'''
+compare = "exact"
+blank_if_zero = true
+
+# unclear: It is not certain whether the measure should also be restricted to Status = 'CLAIMABLE'. I relied on the RecoverableCents column already reflecting what can be claimed now. It is also not certain whether RecoverableCents is in the transaction currency, because the data has no exchange-rate table to convert it.
+# assumption: RecoverableCents is already expressed in USD cents, converted by the engine at its exchange rates; there is no rate table, so no further conversion is applied.
+# assumption: The engine populates RecoverableCents only for amounts that can be claimed now, so no extra Status filter is applied.
+# assumption: Cents are divided by 100 to give dollars.
+[[measure]]
+name = "Recoverable USD"
+sql = '''SUM(Findings.RecoverableCents) / 100.0'''
+compare = "money"
+
+# unclear: The 'USD' suffix suggests a currency conversion, but no exchange rates exist in the data. If ExpiredCents is in local currency, non-USD rows would need conversion that cannot be done here.
+# assumption: The measure is the sum of Findings.ExpiredCents converted from cents to dollars by dividing by 100.
+# assumption: ExpiredCents is assumed to already be expressed in USD-equivalent cents. The model has no FX rate table, so the Currency column is not used for conversion.
+# assumption: No extra Status filter is applied. ExpiredCents is assumed to already represent only amounts that were recoverable but whose dispute window has closed, so it should be non-zero only for findings past the window.
+[[measure]]
+name = "Lost to Window USD"
+sql = '''SUM(Findings.ExpiredCents) / 100.0'''
+compare = "money"
+
+# unclear: The Findings table has a Currency column with non-USD values but no FX rates. If ExpectedValueCents is stored in local currency, a USD conversion would be needed that cannot be done from this data.
+# assumption: Uses the precomputed Findings.ExpectedValueCents column, taken to be RecoverableCents times the category's historical win rate, rather than recomputing RecoverableCents * WinRate.
+# assumption: Amounts are treated as already expressed in USD cents and divided by 100. No FX conversion is applied because the data has no exchange-rate table.
+# assumption: No status filter is applied. Non-recoverable findings are assumed to carry zero expected value already.
+# assumption: Returns NULL when the slice has no rows (SUM over an empty set).
+[[measure]]
+name = "Expected Value USD"
+sql = '''SUM(Findings.ExpectedValueCents) / 100.0'''
+compare = "money"
+
+# unclear: The data has an Urgent boolean column, but its exact definition is not documented. The measure might simply count Urgent = TRUE, and that column could include non-claimable statuses. Whether the 30-day boundary is inclusive is also not stated.
+# assumption: 'Claims' is read as findings with Status = 'CLAIMABLE'. Expired, recovered, not-claimable and review items are excluded.
+# assumption: 'Closes within 30 days of the as-of date' is read as DaysLeft <= 30, inclusive of 0. DaysLeft is taken as already measured from the as-of date.
+# assumption: Each finding row counts as one claim (FindingKey is unique).
+[[measure]]
+name = "Urgent Claims"
+sql = '''COUNT(*) FILTER (WHERE Findings.Status = 'CLAIMABLE' AND Findings.DaysLeft <= 30)'''
+compare = "exact"
+blank_if_zero = true
+
+# unclear: It is unclear whether 'USD' in the name means amounts are already converted to USD or that only USD-currency findings count. I assumed they are converted and included all currencies. It is also unclear whether Urgent equals DaysLeft <= 30 or carries additional conditions.
+# assumption: 'Must be filed within 30 days' is taken from the precomputed Findings.Urgent flag rather than recomputed from DaysLeft <= 30.
+# assumption: Recoverable money is RecoverableCents divided by 100 to give dollars.
+# assumption: RecoverableCents is assumed to be already expressed in USD, so there is no conversion and no filter on the Currency column.
+# assumption: There is no extra filter on Status; non-recoverable findings are assumed to carry 0 RecoverableCents.
+# assumption: The result is NULL when no urgent findings exist in the group.
+[[measure]]
+name = "Urgent USD"
+sql = '''SUM(Findings.RecoverableCents) FILTER (WHERE Findings.Urgent) / 100.0'''
+compare = "money"
+
+# unclear: It is unclear whether 'turned out to be claimable' should also count ALREADY_RECOVERED findings, or leave out NEEDS_REVIEW and other undecided findings from the denominator. This reference uses Status = 'CLAIMABLE' over all findings.
+# assumption: 'Claimable' means Status = 'CLAIMABLE' only. ALREADY_RECOVERED and NEEDS_REVIEW are not counted as claimable.
+# assumption: The denominator is all findings in the slice, across every status.
+# assumption: The share is computed over rows (findings), not weighted by amount.
+# assumption: The result is 0 when the group has findings but none are claimable.
+[[measure]]
+name = "Claim Rate"
+sql = '''COUNT(*) FILTER (WHERE Findings.Status = 'CLAIMABLE')::DOUBLE / NULLIF(COUNT(*), 0)'''
+compare = "ratio"
+
+# unclear: It is unclear whether 'ever recoverable' should also include already-recovered amounts. No separate recovered-amount column exists, so the denominator uses only RecoverableCents and ExpiredCents.
+# assumption: 'All money that was ever recoverable' is taken as RecoverableCents plus ExpiredCents, meaning money still recoverable plus money lost to an expired window.
+# assumption: 'Lost to missed deadlines' is taken as ExpiredCents.
+# assumption: Cents are summed across currencies with no FX conversion.
+# assumption: The result is NULL when the denominator is zero.
+[[measure]]
+name = "Share Lost to Window"
+sql = '''SUM(Findings.ExpiredCents)::DOUBLE / NULLIF(SUM(Findings.RecoverableCents) + SUM(Findings.ExpiredCents), 0)'''
+compare = "ratio"
+
+# unclear: It is not clear which statuses count as 'open'. NEEDS_REVIEW, and possibly INSUFFICIENT_EVIDENCE, could also be considered open. It is also not clear whether the average should be weighted by recoverable amount.
+# assumption: 'Open claims' is taken to mean findings with Status = 'CLAIMABLE' (Outcome 'Recover').
+# assumption: The average is a simple unweighted mean of WinRate per finding, not weighted by amount.
+# assumption: Returns NULL when the slice has no claimable findings.
+[[measure]]
+name = "Avg Win Rate"
+sql = '''AVG(Findings.WinRate) FILTER (WHERE Findings.Status = 'CLAIMABLE')'''
+compare = "ratio"
+
+# unclear: The description mentions 'ambiguous references', which could mean MatchTier = 'ambiguous'. The measure name points to the NEEDS_REVIEW status, so that is what is counted.
+# assumption: Counts findings whose Status is 'NEEDS_REVIEW' (label 'Needs review'), not rows where MatchTier = 'ambiguous'.
+# assumption: Each finding row counts once (FindingKey is unique).
+[[measure]]
+name = "Needs Review"
+sql = '''COUNT(*) FILTER (WHERE Findings.Status = 'NEEDS_REVIEW')'''
+compare = "exact"
+blank_if_zero = true
+
+# unclear: 'Open claim' could also be read more broadly: every finding whose Status Outcome is 'Recover' or 'Review', or every finding that is not closed, expired or lost. Under those readings, findings marked NEEDS_REVIEW or INSUFFICIENT_EVIDENCE would also count.
+# assumption: An 'open claim' is taken to be a finding with Status = 'CLAIMABLE' (label 'Claimable'), meaning money that can still be recovered.
+# assumption: Vendors are counted by distinct VendorCode.
+[[measure]]
+name = "Vendors with Claims"
+sql = '''COUNT(DISTINCT Findings.VendorCode) FILTER (WHERE Findings.Status = 'CLAIMABLE')'''
+compare = "exact"
+blank_if_zero = true
+
+# unclear: The name says 'USD', but rows carry several currencies and there is no FX data. The measure might instead be meant to include only Currency = 'USD' rows, or to convert the other currencies; I summed all currencies unconverted.
+# assumption: Recoverable money is RecoverableCents divided by 100 to give currency units.
+# assumption: Claimable rows are those with Status = 'CLAIMABLE'.
+# assumption: There is no exchange-rate table, so amounts are summed across all currencies as-is; 'USD' in the name is taken as the display unit, not as a filter on Currency = 'USD'.
+# assumption: The result is NULL (blank) when the group has no claimable rows.
+[[measure]]
+name = "Open Claim USD"
+sql = '''SUM(Findings.RecoverableCents) FILTER (WHERE Findings.Status = 'CLAIMABLE') / 100.0'''
+compare = "money"
+
+# unclear: This measure is a running total. It sums deductions dated up to the end of the current period, which takes in all dates before the period, and it returns blank after the last deduction date. That is a time-intelligence window over the Date table, not a single per-group aggregate. The slices given (category, status, vendor) have no date grouping, so the 'end of period' context would be the maximum Date in the filter context, and the rule about being blank after the last deduction depends on dates outside the group's rows. It also says USD, but the data has multiple currencies and no FX rates. It cannot be written faithfully as one aggregate expression.
+# assumption: Recoverable amount would come from Findings.RecoverableCents / 100.0, limited to RefType = 'deduction'.
+# assumption: Currency conversion to USD is not possible because no exchange-rate table exists, so amounts might need a filter to Currency = 'USD' or would otherwise be summed as-is.
+[[measure]]
+name = "Recoverable USD Running Total"
