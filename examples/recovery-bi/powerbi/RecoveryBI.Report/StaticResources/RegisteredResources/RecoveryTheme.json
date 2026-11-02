@@ -1,0 +1,28 @@
+{
+  "name": "Recovery",
+  "dataColors": [
+    "#2563EB",
+    "#F97316",
+    "#10B981",
+    "#A855F7",
+    "#EAB308",
+    "#0EA5E9",
+    "#EC4899",
+    "#64748B"
+  ],
+  "foreground": "#1F2937",
+  "background": "#FFFFFF",
+  "tableAccent": "#2563EB",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#1F2937"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 26,
+      "color": "#111827"
+    }
+  }
+}

@@ -1,0 +1,134 @@
+# dax-parity on the Recovery BI model: 14 measures, 6 slices, about 18,000 cells.
+# The model and data come from https://github.com/jmnzcn/recovery-bi (synthetic data).
+
+[model]
+pbip = "powerbi/RecoveryBI.pbip"
+# The scratch copy Power BI opens loads its parquet files from this folder.
+parameters = { DataFolder = "{root}/data" }
+
+[reference]
+tables = { Findings = "data/findings.parquet", Vendor = "data/vendor.parquet", Category = "data/category.parquet", Status = "data/status.parquet", Date = "data/date.parquet" }
+from = """
+Findings
+JOIN Vendor USING (VendorCode)
+JOIN Category USING (CategoryCode)
+JOIN Status USING (Status)
+JOIN "Date" ON Findings.EventDate = "Date"."Date"
+"""
+
+[results]
+path = "parity/dax_results.json"
+
+# Counts: COUNTROWS over no rows is BLANK in DAX, COUNT(*) is 0 in SQL; blank_if_zero lines them up.
+[[measure]]
+name = "Total Findings"
+sql = "COUNT(*)"
+compare = "exact"
+blank_if_zero = true
+
+[[measure]]
+name = "Claims"
+sql = "COUNT(*) FILTER (WHERE Findings.Status = 'CLAIMABLE')"
+compare = "exact"
+blank_if_zero = true
+
+[[measure]]
+name = "Urgent Claims"
+sql = "COUNT(*) FILTER (WHERE Findings.Status = 'CLAIMABLE' AND Findings.Urgent)"
+compare = "exact"
+blank_if_zero = true
+
+[[measure]]
+name = "Needs Review"
+sql = "COUNT(*) FILTER (WHERE Findings.Status = 'NEEDS_REVIEW')"
+compare = "exact"
+blank_if_zero = true
+
+[[measure]]
+name = "Vendors with Claims"
+sql = "COUNT(DISTINCT Findings.VendorCode) FILTER (WHERE Findings.Status = 'CLAIMABLE')"
+compare = "exact"
+blank_if_zero = true
+
+# Money is stored in integer cents; a cent of difference is a failure.
+[[measure]]
+name = "Recoverable USD"
+sql = "SUM(Findings.RecoverableCents) / 100.0"
+compare = "money"
+
+[[measure]]
+name = "Lost to Window USD"
+sql = "SUM(Findings.ExpiredCents) / 100.0"
+compare = "money"
+
+[[measure]]
+name = "Expected Value USD"
+sql = "SUM(Findings.ExpectedValueCents) / 100.0"
+compare = "money"
+
+[[measure]]
+name = "Urgent USD"
+sql = "SUM(Findings.RecoverableCents) FILTER (WHERE Findings.Urgent) / 100.0"
+compare = "money"
+
+[[measure]]
+name = "Open Claim USD"
+sql = "SUM(Findings.RecoverableCents) FILTER (WHERE Findings.Status = 'CLAIMABLE') / 100.0"
+compare = "money"
+
+# Ratios. Claim Rate deliberately has no blank_if_zero: 0 % must show as 0 %, not as an empty cell.
+[[measure]]
+name = "Claim Rate"
+sql = "(COUNT(*) FILTER (WHERE Findings.Status = 'CLAIMABLE'))::DOUBLE / COUNT(*)"
+
+[[measure]]
+name = "Share Lost to Window"
+sql = "SUM(Findings.ExpiredCents)::DOUBLE / NULLIF(SUM(Findings.RecoverableCents) + SUM(Findings.ExpiredCents), 0)"
+
+[[measure]]
+name = "Avg Win Rate"
+sql = "AVG(Findings.WinRate) FILTER (WHERE Findings.Status = 'CLAIMABLE')"
+
+# Needs the date context, so it is only tested on the monthly slice, which brings its own SQL.
+[[measure]]
+name = "Recoverable USD Running Total"
+compare = "money"
+
+[[slice]]
+id = "totals"
+
+[[slice]]
+id = "by_category"
+by = ["'Category'[CategoryCode]"]
+
+[[slice]]
+id = "by_status"
+by = ["'Status'[Status]"]
+
+[[slice]]
+id = "by_vendor"
+by = ["'Vendor'[VendorCode]"]
+
+[[slice]]
+id = "by_vendor_category"
+by = ["'Vendor'[VendorCode]", "'Category'[CategoryCode]"]
+
+[[slice]]
+id = "by_month"
+by = ["'Date'[Month]"]
+measures = ["Recoverable USD", "Recoverable USD Running Total"]
+sql = """
+WITH months AS (
+    SELECT d.Month, SUM(f.RecoverableCents) AS cents, COUNT(f.FindingKey) AS n
+    FROM "Date" d LEFT JOIN Findings f ON f.EventDate = d."Date"
+    GROUP BY d.Month
+),
+last_event AS (SELECT strftime(MAX(EventDate), '%Y-%m') AS month FROM Findings)
+SELECT
+    m.Month AS "Date[Month]",
+    CASE WHEN m.n > 0 THEN m.cents / 100.0 END AS "Recoverable USD",
+    CASE WHEN m.Month <= l.month AND SUM(m.n) OVER w > 0 THEN SUM(m.cents) OVER w / 100.0 END
+        AS "Recoverable USD Running Total"
+FROM months m, last_event l
+WINDOW w AS (ORDER BY m.Month ROWS UNBOUNDED PRECEDING)
+"""

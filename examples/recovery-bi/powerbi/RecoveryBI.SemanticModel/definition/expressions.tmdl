@@ -1,0 +1,5 @@
+/// Folder holding the exported parquet tables. Rebuild with `recovery-bi build` to point it at your checkout.
+expression DataFolder = "C:\recovery-bi\data" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 9c6b5430-bc92-5744-9024-32aea85c471b
+
+	annotation PBI_ResultType = Text

@@ -1,0 +1,68 @@
+/// Calendar for event dates; marked as the model's date table.
+table Date
+	lineageTag: a63f01d3-5f0a-5092-9b64-913867133c18
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isKey
+		lineageTag: 225ef70d-d224-5bc5-9c54-fea1e9b98f17
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = User
+
+	column Year
+		dataType: int64
+		lineageTag: d1744d75-8912-5e70-846f-19cb7fccf5c3
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = User
+
+	column Quarter
+		dataType: string
+		lineageTag: 693bec4f-379b-5afb-98de-6f15d2f727f1
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = User
+
+	column MonthNumber
+		dataType: int64
+		isHidden
+		lineageTag: c50a9e1f-d68d-5cad-8d45-3a33e87d8f06
+		summarizeBy: none
+		sourceColumn: MonthNumber
+
+		annotation SummarizationSetBy = User
+
+	column Month
+		dataType: string
+		lineageTag: de576d2d-d24c-545f-ad5b-cc92a07e3a57
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: MonthIndex
+
+		annotation SummarizationSetBy = User
+
+	column MonthIndex
+		dataType: int64
+		isHidden
+		lineageTag: bf8a365f-cbd0-50e7-b220-a4601c8f47d6
+		summarizeBy: none
+		sourceColumn: MonthIndex
+
+		annotation SummarizationSetBy = User
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "\date.parquet")),
+				    Typed = Table.TransformColumnTypes(Source, {{"Date", type date}, {"Year", Int64.Type}, {"Quarter", type text}, {"MonthNumber", Int64.Type}, {"Month", type text}, {"MonthIndex", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

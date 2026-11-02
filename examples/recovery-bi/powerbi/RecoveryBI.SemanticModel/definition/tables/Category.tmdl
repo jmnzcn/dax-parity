@@ -1,0 +1,50 @@
+/// Deduction and payment categories, in report order.
+table Category
+	lineageTag: 5ad34dc7-b22b-5029-ba50-f2ea6ca3e8ab
+
+	column CategoryCode
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: 2c087e8c-e6f0-5da7-9e39-fcb14b7a35a7
+		summarizeBy: none
+		sourceColumn: CategoryCode
+
+		annotation SummarizationSetBy = User
+
+	column Category
+		dataType: string
+		lineageTag: e4b05453-1a88-55c4-b73f-9ecfce43baa2
+		summarizeBy: none
+		sourceColumn: Category
+		sortByColumn: CategoryOrder
+
+		annotation SummarizationSetBy = User
+
+	column Kind
+		dataType: string
+		lineageTag: d8c24d55-af09-5f16-9cb0-84b1d481e7d5
+		summarizeBy: none
+		sourceColumn: Kind
+
+		annotation SummarizationSetBy = User
+
+	column CategoryOrder
+		dataType: int64
+		isHidden
+		lineageTag: a2d93677-a106-5c71-a3d7-0b866568a9b9
+		summarizeBy: none
+		sourceColumn: CategoryOrder
+
+		annotation SummarizationSetBy = User
+
+	partition Category = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "\category.parquet")),
+				    Typed = Table.TransformColumnTypes(Source, {{"CategoryCode", type text}, {"Category", type text}, {"Kind", type text}, {"CategoryOrder", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "RecoveryBI"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8281832f-ecb1-50ce-beea-51c99644c05d"
+  }
+}

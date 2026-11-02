@@ -1,0 +1,31 @@
+/// The 170 vendors in the synthetic world.
+table Vendor
+	lineageTag: bb364afe-a5b6-5fa8-82fa-6105ac56615e
+
+	column VendorCode
+		dataType: string
+		isKey
+		lineageTag: 295736ef-b474-5fc3-868c-c861c2397904
+		summarizeBy: none
+		sourceColumn: VendorCode
+
+		annotation SummarizationSetBy = User
+
+	column Vendor
+		dataType: string
+		lineageTag: 4ca77934-3e9f-578b-9d49-a8213a7441ac
+		summarizeBy: none
+		sourceColumn: Vendor
+
+		annotation SummarizationSetBy = User
+
+	partition Vendor = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "\vendor.parquet")),
+				    Typed = Table.TransformColumnTypes(Source, {{"VendorCode", type text}, {"Vendor", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

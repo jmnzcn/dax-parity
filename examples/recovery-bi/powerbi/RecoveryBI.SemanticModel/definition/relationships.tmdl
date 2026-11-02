@@ -1,0 +1,15 @@
+relationship 595954ee-8530-5afa-aee1-9eeb4c83e199
+	fromColumn: Findings.VendorCode
+	toColumn: Vendor.VendorCode
+
+relationship 73ad1dc1-0f57-5064-b6ea-931d85872bf6
+	fromColumn: Findings.CategoryCode
+	toColumn: Category.CategoryCode
+
+relationship fc95d711-c197-5dcf-80d6-28e147a46c97
+	fromColumn: Findings.Status
+	toColumn: Status.Status
+
+relationship d9045937-d736-5990-bb69-7843c02d3f8c
+	fromColumn: Findings.EventDate
+	toColumn: Date.Date

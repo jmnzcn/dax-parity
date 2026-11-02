@@ -1,0 +1,21 @@
+table Sales
+	lineageTag: a
+
+	/// total
+	measure Revenue = SUM ( Sales[Amount] )
+		formatString: #,0.00
+
+	measure 'Big Orders' =
+			CALCULATE (
+				COUNTROWS ( Sales ),
+				Sales[Amount] > 100
+			)
+		formatString: #,0
+
+	measure 'Bob''s Share' = ```
+			DIVIDE ( [Revenue], 2 )
+			```
+		displayFolder: x
+
+	column Amount
+		dataType: double

@@ -1,0 +1,50 @@
+/// What the engine decided for a finding.
+table Status
+	lineageTag: 0e2d18ff-2348-5e11-b382-43e17efd40b2
+
+	column Status
+		dataType: string
+		isHidden
+		isKey
+		lineageTag: dd82010d-ba4a-57eb-b3c9-d5653400e278
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = User
+
+	column StatusLabel
+		dataType: string
+		lineageTag: 480dd44c-7cdb-5b99-bf8c-031a9e2dcf08
+		summarizeBy: none
+		sourceColumn: StatusLabel
+		sortByColumn: StatusOrder
+
+		annotation SummarizationSetBy = User
+
+	column Outcome
+		dataType: string
+		lineageTag: 0f1e39c7-5633-54ce-9be2-a0f9a55b37e5
+		summarizeBy: none
+		sourceColumn: Outcome
+
+		annotation SummarizationSetBy = User
+
+	column StatusOrder
+		dataType: int64
+		isHidden
+		lineageTag: 64780d93-8571-5419-a4be-a108d420cf6a
+		summarizeBy: none
+		sourceColumn: StatusOrder
+
+		annotation SummarizationSetBy = User
+
+	partition Status = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "\status.parquet")),
+				    Typed = Table.TransformColumnTypes(Source, {{"Status", type text}, {"StatusLabel", type text}, {"Outcome", type text}, {"StatusOrder", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "e0fbfbd9b1f15b998d1e",
+  "position": {
+    "x": 652,
+    "y": 558,
+    "z": 9,
+    "width": 612,
+    "height": 146,
+    "tabOrder": 9
+  },
+  "visual": {
+    "visualType": "multiRowCard",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Claim Rate"
+                }
+              },
+              "queryRef": "Findings.Claim Rate",
+              "nativeQueryRef": "Claim Rate"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Share Lost to Window"
+                }
+              },
+              "queryRef": "Findings.Share Lost to Window",
+              "nativeQueryRef": "Share Lost to Window"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Avg Win Rate"
+                }
+              },
+              "queryRef": "Findings.Avg Win Rate",
+              "nativeQueryRef": "Avg Win Rate"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Findings"
+                    }
+                  },
+                  "Property": "Needs Review"
+                }
+              },
+              "queryRef": "Findings.Needs Review",
+              "nativeQueryRef": "Needs Review"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Rates'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,282 @@
+/// One row per deduction or payment the engine decided, with its verdict and the source row that proves it.
+table Findings
+	lineageTag: cca9e60b-07fd-54de-ab1e-e3c88afd1f8d
+
+	/// Deductions and payments the engine decided, whatever the outcome.
+	measure 'Total Findings' = COUNTROWS ( Findings )
+		formatString: #,0
+		displayFolder: Volume
+		lineageTag: 10605c10-d1b7-5061-9a76-0385a338bfa8
+
+	/// Findings that can be disputed now, with evidence.
+	measure Claims = CALCULATE ( COUNTROWS ( Findings ), Findings[Status] = "CLAIMABLE" )
+		formatString: #,0
+		displayFolder: Volume
+		lineageTag: 61f5e7b8-1d57-596b-bc5c-75b6125c0745
+
+	/// Money that can be claimed back now, in USD at the engine's exchange rates.
+	measure 'Recoverable USD' = DIVIDE ( SUM ( Findings[RecoverableCents] ), 100 )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Money
+		lineageTag: 1a15e604-bd0b-5165-b756-7261b268bda8
+
+	/// Money that was recoverable but whose dispute window has closed.
+	measure 'Lost to Window USD' = DIVIDE ( SUM ( Findings[ExpiredCents] ), 100 )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Money
+		lineageTag: 5593d47d-58ae-53ba-a82f-5ff0177682fc
+
+	/// Recoverable money weighted by each category's historical win rate.
+	measure 'Expected Value USD' = DIVIDE ( SUM ( Findings[ExpectedValueCents] ), 100 )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Money
+		lineageTag: 487be3c3-af91-5aaf-bc62-c4a8fe29d110
+
+	/// Claims whose dispute window closes within 30 days of the as-of date.
+	measure 'Urgent Claims' = CALCULATE ( [Claims], Findings[Urgent] = TRUE () )
+		formatString: #,0
+		displayFolder: Urgency
+		lineageTag: 7b811ba5-55af-57cd-b663-3cb098d2fc07
+
+	/// Recoverable money in claims that must be filed within 30 days.
+	measure 'Urgent USD' = CALCULATE ( [Recoverable USD], Findings[Urgent] = TRUE () )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Urgency
+		lineageTag: a00f2f77-0812-5129-9e11-e41ec0c18d09
+
+	/// Share of findings that turned out to be claimable.
+	measure 'Claim Rate' = DIVIDE ( [Claims] + 0, [Total Findings] )
+		formatString: 0.0%
+		displayFolder: Ratios
+		lineageTag: bcd08350-146c-55de-87e8-671d9225a0ba
+
+	/// Of all money that was ever recoverable, the share lost to missed deadlines.
+	measure 'Share Lost to Window' =
+			VAR Recoverable = SUM ( Findings[RecoverableCents] )
+			VAR Expired = SUM ( Findings[ExpiredCents] )
+			RETURN DIVIDE ( Expired, Recoverable + Expired )
+		formatString: 0.0%
+		displayFolder: Ratios
+		lineageTag: 8ba431d0-ccd9-5ce8-9666-79d873c595bd
+
+	/// Average historical win rate of the open claims.
+	measure 'Avg Win Rate' = CALCULATE ( AVERAGE ( Findings[WinRate] ), Findings[Status] = "CLAIMABLE" )
+		formatString: 0.0%
+		displayFolder: Ratios
+		lineageTag: c7c058ab-df22-5e9d-a0a5-46f839811328
+
+	/// Ambiguous references a person has to decide.
+	measure 'Needs Review' = CALCULATE ( COUNTROWS ( Findings ), Findings[Status] = "NEEDS_REVIEW" )
+		formatString: #,0
+		displayFolder: Volume
+		lineageTag: d933be9b-459a-5a52-a463-654808abe166
+
+	/// Vendors with at least one open claim.
+	measure 'Vendors with Claims' = CALCULATE ( DISTINCTCOUNT ( Findings[VendorCode] ), Findings[Status] = "CLAIMABLE" )
+		formatString: #,0
+		displayFolder: Volume
+		lineageTag: 44c948b9-9d72-5fb8-af99-4f389de7bcc4
+
+	/// Recoverable money restricted to claimable rows; blank elsewhere, so work-queue tables hide the rest.
+	measure 'Open Claim USD' = CALCULATE ( [Recoverable USD], Findings[Status] = "CLAIMABLE" )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Money
+		lineageTag: 8412dd43-66d5-5d2e-aa80-18eb75ca6dad
+
+	/// Recoverable money from deductions dated up to the end of the period; blank after the last deduction.
+	measure 'Recoverable USD Running Total' =
+			VAR LastDay = MAX ( 'Date'[Date] )
+			VAR LastEvent = CALCULATE ( MAX ( Findings[EventDate] ), ALL ( Findings ) )
+			RETURN
+			    IF (
+			        MIN ( 'Date'[Date] ) <= LastEvent,
+			        CALCULATE ( [Recoverable USD], 'Date'[Date] <= LastDay, ALL ( 'Date' ) )
+			    )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: Money
+		lineageTag: b86f5b1e-ed30-505b-acc9-26249a1a35ab
+
+	column FindingKey
+		dataType: string
+		isHidden
+		lineageTag: 0665de25-fd52-5c78-b3f7-f30f6f001a18
+		summarizeBy: none
+		sourceColumn: FindingKey
+
+		annotation SummarizationSetBy = User
+
+	column VendorCode
+		dataType: string
+		isHidden
+		lineageTag: f765e2e3-3869-52cd-b5b1-c4d80584bd86
+		summarizeBy: none
+		sourceColumn: VendorCode
+
+		annotation SummarizationSetBy = User
+
+	column CategoryCode
+		dataType: string
+		isHidden
+		lineageTag: f8c38452-5e56-5b24-963a-7203c2385655
+		summarizeBy: none
+		sourceColumn: CategoryCode
+
+		annotation SummarizationSetBy = User
+
+	column Status
+		dataType: string
+		isHidden
+		lineageTag: a2db1b83-2168-51b9-bfe2-3c19eb54a3a2
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = User
+
+	column RefType
+		dataType: string
+		lineageTag: f6df2152-d2f6-59ba-a627-6c241940e12b
+		summarizeBy: none
+		sourceColumn: RefType
+
+		annotation SummarizationSetBy = User
+
+	column Ref
+		dataType: string
+		lineageTag: 9797380b-980e-5bce-919d-846e18e032dc
+		summarizeBy: none
+		sourceColumn: Ref
+
+		annotation SummarizationSetBy = User
+
+	column EventDate
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 47dbe16c-ec5c-5068-9754-1c2ca23bc91f
+		summarizeBy: none
+		sourceColumn: EventDate
+
+		annotation SummarizationSetBy = User
+
+	column DisputeDeadline
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 51dc9114-354c-543c-bbe6-5e967f9fca5d
+		summarizeBy: none
+		sourceColumn: DisputeDeadline
+
+		annotation SummarizationSetBy = User
+
+	column DaysLeft
+		dataType: int64
+		formatString: #,0
+		lineageTag: f36989ff-18ea-50f3-ae6e-d0a08be683eb
+		summarizeBy: none
+		sourceColumn: DaysLeft
+
+		annotation SummarizationSetBy = User
+
+	column Currency
+		dataType: string
+		lineageTag: 8d514c22-b7aa-5cce-954e-b892a08ad533
+		summarizeBy: none
+		sourceColumn: Currency
+
+		annotation SummarizationSetBy = User
+
+	column RecoverableCents
+		dataType: int64
+		isHidden
+		lineageTag: 37111d32-ccba-58c0-9971-7fee42fcb46f
+		summarizeBy: none
+		sourceColumn: RecoverableCents
+
+		annotation SummarizationSetBy = User
+
+	column ExpiredCents
+		dataType: int64
+		isHidden
+		lineageTag: bd6f9183-f3f3-5e99-a083-31aa3dfbece8
+		summarizeBy: none
+		sourceColumn: ExpiredCents
+
+		annotation SummarizationSetBy = User
+
+	column ExpectedValueCents
+		dataType: int64
+		isHidden
+		lineageTag: 09796fc1-537c-5513-ac9c-697c6544f967
+		summarizeBy: none
+		sourceColumn: ExpectedValueCents
+
+		annotation SummarizationSetBy = User
+
+	column WinRate
+		dataType: double
+		formatString: 0%
+		isHidden
+		lineageTag: 5fb73a18-3e4a-5a08-8222-a7f845b0aabe
+		summarizeBy: none
+		sourceColumn: WinRate
+
+		annotation SummarizationSetBy = User
+
+	column Urgent
+		dataType: boolean
+		lineageTag: d42bfccc-c744-51d7-87d3-d7df4c54b40d
+		summarizeBy: none
+		sourceColumn: Urgent
+
+		annotation SummarizationSetBy = User
+
+	column PriorityRank
+		dataType: int64
+		formatString: #,0
+		lineageTag: a15d832e-91f7-506e-bc6a-a909d0368284
+		summarizeBy: none
+		sourceColumn: PriorityRank
+
+		annotation SummarizationSetBy = User
+
+	column MatchTier
+		dataType: string
+		lineageTag: 03792255-9c56-5f3a-9ccd-49b2888e81f7
+		summarizeBy: none
+		sourceColumn: MatchTier
+
+		annotation SummarizationSetBy = User
+
+	column Reason
+		dataType: string
+		lineageTag: 05844ad4-dbae-559f-ba92-85a5d5f993f9
+		summarizeBy: none
+		sourceColumn: Reason
+
+		annotation SummarizationSetBy = User
+
+	column SourceFile
+		dataType: string
+		lineageTag: aa93a546-5392-5661-bf43-269a2d4e8dbf
+		summarizeBy: none
+		sourceColumn: SourceFile
+
+		annotation SummarizationSetBy = User
+
+	column SourceRow
+		dataType: int64
+		formatString: 0
+		lineageTag: f2a1c8a0-6cdd-5dc6-8fb3-0da34f60ee80
+		summarizeBy: none
+		sourceColumn: SourceRow
+
+		annotation SummarizationSetBy = User
+
+	partition Findings = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents(DataFolder & "\findings.parquet")),
+				    Typed = Table.TransformColumnTypes(Source, {{"FindingKey", type text}, {"VendorCode", type text}, {"CategoryCode", type text}, {"Status", type text}, {"RefType", type text}, {"Ref", type text}, {"EventDate", type date}, {"DisputeDeadline", type date}, {"DaysLeft", Int64.Type}, {"Currency", type text}, {"RecoverableCents", Int64.Type}, {"ExpiredCents", Int64.Type}, {"ExpectedValueCents", Int64.Type}, {"WinRate", type number}, {"Urgent", type logical}, {"PriorityRank", Int64.Type}, {"MatchTier", type text}, {"Reason", type text}, {"SourceFile", type text}, {"SourceRow", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

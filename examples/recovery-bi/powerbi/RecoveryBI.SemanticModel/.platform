@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "RecoveryBI"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "63b5262e-0af4-5602-a074-46ab3bf1b0b8"
+  }
+}
