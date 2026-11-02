@@ -1,0 +1,27 @@
+dax-parity mutate on examples/recovery-bi, before the by_category_month slice was added.
+47 mutants, 32 seconds in Power BI Desktop.
+
+mutation score: 96%  (45 killed, 2 survived, 0 untested, 0 invalid)
+
+by measure:
+  Claims                           3 of   3 caught
+  Recoverable USD                  3 of   3 caught
+  Lost to Window USD               3 of   3 caught
+  Expected Value USD               3 of   3 caught
+  Urgent Claims                    3 of   3 caught
+  Urgent USD                       3 of   3 caught
+  Claim Rate                       2 of   2 caught
+  Share Lost to Window             4 of   4 caught
+  Avg Win Rate                     4 of   4 caught
+  Needs Review                     3 of   3 caught
+  Vendors with Claims              4 of   4 caught
+  Open Claim USD                   3 of   3 caught
+  Recoverable USD Running Total    7 of   9 caught  <-
+
+bugs the checks would miss:
+  Recoverable USD Running Total: drop ALL ( Findings )
+      VAR LastDay = MAX ( 'Date'[Date] ) VAR LastEvent = CALCULATE ( MAX ( Findings[EventDate] ) ) RETURN IF ( MIN ( 'Date'[Date] ) <= LastEvent,
+      -> a slice that groups by the column this filter or ALL touches would show it
+  Recoverable USD Running Total: drop ALL ( 'Date' )
+      VAR LastDay = MAX ( 'Date'[Date] ) VAR LastEvent = CALCULATE ( MAX ( Findings[EventDate] ), ALL ( Findings ) ) RETURN IF ( MIN ( 'Date'[Date
+      -> a slice that groups by the column this filter or ALL touches would show it

@@ -132,3 +132,34 @@ SELECT
 FROM months m, last_event l
 WINDOW w AS (ORDER BY m.Month ROWS UNBOUNDED PRECEDING)
 """
+
+# Added after the first mutation run: on by_month alone, removing ALL ( Findings ) from the running
+# total changed nothing, because every month had findings. By category, some months don't.
+[[slice]]
+id = "by_category_month"
+by = ["'Category'[CategoryCode]", "'Date'[Month]"]
+measures = ["Recoverable USD", "Recoverable USD Running Total"]
+sql = """
+WITH cells AS (
+    SELECT c.CategoryCode, m.Month, SUM(f.RecoverableCents) AS cents, COUNT(f.FindingKey) AS n
+    FROM Category c
+    CROSS JOIN (SELECT DISTINCT Month FROM "Date") m
+    LEFT JOIN (SELECT *, strftime(EventDate, '%Y-%m') AS Month FROM Findings) f
+        ON f.CategoryCode = c.CategoryCode AND f.Month = m.Month
+    GROUP BY c.CategoryCode, m.Month
+),
+last_event AS (SELECT strftime(MAX(EventDate), '%Y-%m') AS month FROM Findings)
+SELECT
+    x.CategoryCode AS "Category[CategoryCode]",
+    x.Month AS "Date[Month]",
+    CASE WHEN x.n > 0 THEN x.cents / 100.0 END AS "Recoverable USD",
+    CASE WHEN x.Month <= l.month AND SUM(x.n) OVER w > 0 THEN SUM(x.cents) OVER w / 100.0 END
+        AS "Recoverable USD Running Total"
+FROM cells x, last_event l
+WINDOW w AS (PARTITION BY x.CategoryCode ORDER BY x.Month ROWS UNBOUNDED PRECEDING)
+"""
+
+# A surviving mutant that can never change a result, and why. Listed in the report, not scored.
+[[mutate.equivalent]]
+id = "Recoverable USD Running Total / drop_filter / drop ALL ( 'Date' )"
+reason = "'Date' is marked as a date table, so filtering 'Date'[Date] in CALCULATE already removes every other filter on 'Date'. The ALL is redundant."

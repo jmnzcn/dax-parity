@@ -10,7 +10,10 @@ Power BI's own engine.
 You write each measure a second time as plain SQL over the same data. dax-parity runs both: the DAX
 inside Power BI Desktop, the SQL in DuckDB. It compares every measure across every slice you choose
 (totals, by product, by customer, by month, by customer and product) and tells you which cells differ
-and why. On the example in this repo that is 17,885 cells in about 30 seconds.
+and why. On the example in this repo that is 18,159 cells in about 30 seconds.
+
+It can also test the tests: `dax-parity mutate` plants small bugs in your measures and reports which
+ones your checks would miss. That's mutation testing, applied to a Power BI model.
 
 ## Why
 
@@ -47,6 +50,59 @@ This is differential testing: two independent implementations of the same thing,
 of inputs. It works because SQL and DAX fail differently. A wrong filter context, a relationship
 going the wrong way, BLANK handling, a `DIVIDE` that hides a zero: SQL doesn't share those mistakes,
 so they show up as differences.
+
+## Mutation testing: are your checks good enough?
+
+Passing checks only mean something if they would fail on a broken measure. `dax-parity mutate`
+finds out. It breaks each measure on purpose, one small change at a time (SUM becomes AVERAGE, a
+filter disappears from CALCULATE, `>=` becomes `>`, a `+ 0` goes missing), runs the affected queries
+in Power BI's engine and counts how many of those bugs the checks catch. The change is made in the
+running engine and undone right after, so 47 mutants take about 30 seconds and your files are never
+touched.
+
+The first run on the example scored 96 %. Two mutants survived, both in the running total
+([full output](docs/mutation-first-run.txt)):
+
+```
+mutation score: 96%  (45 killed, 2 survived, 0 untested, 0 invalid)
+  Recoverable USD Running Total    7 of   9 caught  <-
+
+bugs the checks would miss:
+  Recoverable USD Running Total: drop ALL ( Findings )
+  Recoverable USD Running Total: drop ALL ( 'Date' )
+```
+
+They meant two different things:
+
+- Without `ALL ( Findings )` the running total stops at each group's own last deduction instead of
+  the overall last one. The checks only compared it by month, and every month had deductions, so
+  the bug was invisible. Comparing it by category and month, where some months are empty, catches
+  it. That was a real gap in the tests, now closed.
+- `ALL ( 'Date' )` turned out to do nothing. `'Date'` is marked as a date table, so filtering
+  `'Date'[Date]` inside CALCULATE already removes the other date filters. No test can catch its
+  removal because the measure doesn't need it. That kind of mutant is called equivalent; you mark it
+  in `dax-parity.toml` with the reason, and it is listed but not scored.
+
+After that: 46 of 46 caught, plus 1 equivalent.
+
+```toml
+[[mutate.equivalent]]
+id = "Recoverable USD Running Total / drop_filter / drop ALL ( 'Date' )"
+reason = "'Date' is marked as a date table, so the ALL is redundant."
+```
+
+```bash
+dax-parity mutate                          # every measure, every operator
+dax-parity mutate --measure "Claim Rate"   # one measure
+dax-parity mutate --operators drop_filter,blank --json mutants.json
+dax-parity mutate --min-score 0.9          # exit 1 below 90 %
+```
+
+Operators: `aggregation`, `comparison`, `logical`, `arithmetic`, `constant`, `boolean`, `string`,
+`drop_filter`, `negate_if`, `blank` and `divide` (swaps numerator and denominator). Changes are made on
+tokens, so text inside strings, names and comments is never touched. A mutant is only run against the
+slices that can see it: the measure itself and every tested measure built on it. A mutant of a measure
+no slice compares counts as "untested" and lowers the score.
 
 ## How it works
 
@@ -111,6 +167,7 @@ dax-parity check           # anywhere; --junit report.xml for CI test reports
 dax-parity run             # both
 dax-parity queries         # print the DAX it will run
 dax-parity validate        # check the TMDL with Microsoft's Tabular Object Model
+dax-parity mutate          # Windows: break each measure on purpose, see what the checks catch
 ```
 
 Exit codes: 0 everything matches, 1 differences, 2 configuration error, 3 recorded results out of
@@ -130,7 +187,7 @@ and also validates the model's TMDL with Microsoft's Tabular Object Model.
 
 ## Requirements and limits
 
-- Recording needs Windows, Power BI Desktop and the .NET 8 SDK or later. The small .NET runner is
+- Recording and mutation testing need Windows, Power BI Desktop and the .NET 8 SDK or later. The small .NET runner is
   built on first use. Checking only needs Python 3.11+.
 - It tests models saved as Power BI Projects (`.pbip`, TMDL format), not `.pbix` files.
 - The reference has to be written by someone who didn't just translate the DAX line by line, or
@@ -142,8 +199,8 @@ and also validates the model's TMDL with Microsoft's Tabular Object Model.
 
 The open-source version stays focused on Power BI Desktop and recorded results. I'm working on a
 commercial edition for teams: running the queries directly against Fabric and Premium workspaces
-over XMLA (no Windows machine or recording step), service principal setups for Azure DevOps and
-GitHub Actions, and HTML reports for audits. If that would help your team, write to
+over XMLA (no Windows machine or recording step), mutation testing on large models in parallel,
+service principal setups for Azure DevOps and GitHub Actions, and HTML reports for audits. If that would help your team, write to
 [neyfred@gmail.com](mailto:neyfred@gmail.com).
 
 ## Related tools

@@ -1,7 +1,7 @@
 {
- "tool": "dax-parity 0.1.0",
+ "tool": "dax-parity 0.2.0",
  "engine": "Power BI Desktop (Analysis Services 17.0.93.23)",
- "recorded_utc": "2026-11-02T04:17:10Z",
+ "recorded_utc": "2026-11-02T05:36:20Z",
  "queries": {
   "totals": {
    "dax": "EVALUATE ROW ( \"Total Findings\", [Total Findings], \"Claims\", [Claims], \"Urgent Claims\", [Urgent Claims], \"Needs Review\", [Needs Review], \"Vendors with Claims\", [Vendors with Claims], \"Recoverable USD\", [Recoverable USD], \"Lost to Window USD\", [Lost to Window USD], \"Expected Value USD\", [Expected Value USD], \"Urgent USD\", [Urgent USD], \"Open Claim USD\", [Open Claim USD], \"Claim Rate\", [Claim Rate], \"Share Lost to Window\", [Share Lost to Window], \"Avg Win Rate\", [Avg Win Rate] )",
@@ -23277,6 +23277,833 @@
      "[Recoverable USD Running Total]": 895010.37
     }
    ]
+  },
+  "by_category_month": {
+   "dax": "EVALUATE SUMMARIZECOLUMNS ( 'Category'[CategoryCode], 'Date'[Month], \"Recoverable USD\", [Recoverable USD], \"Recoverable USD Running Total\", [Recoverable USD Running Total] )",
+   "rows": [
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-03",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-03",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-03",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-03",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-04",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-04",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-04",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-04",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-04",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-05",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-06",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 587.32,
+     "[Recoverable USD Running Total]": 587.32
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 184.17,
+     "[Recoverable USD Running Total]": 184.17
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 65.36,
+     "[Recoverable USD Running Total]": 65.36
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 75.63,
+     "[Recoverable USD Running Total]": 75.63
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 8.66,
+     "[Recoverable USD Running Total]": 8.66
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 0,
+     "[Recoverable USD Running Total]": 0
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-07",
+     "[Recoverable USD]": 25,
+     "[Recoverable USD Running Total]": 25
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 46477.36,
+     "[Recoverable USD Running Total]": 46477.36
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 17025.49,
+     "[Recoverable USD Running Total]": 17612.81
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 4362.79,
+     "[Recoverable USD Running Total]": 4546.96
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 4248.1,
+     "[Recoverable USD Running Total]": 4313.46
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 3902.2,
+     "[Recoverable USD Running Total]": 3977.83
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 3282.35,
+     "[Recoverable USD Running Total]": 3291.01
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 2349.06,
+     "[Recoverable USD Running Total]": 2349.06
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-08",
+     "[Recoverable USD]": 1236.06,
+     "[Recoverable USD Running Total]": 1261.06
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 45105.43,
+     "[Recoverable USD Running Total]": 91582.79
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 17882.08,
+     "[Recoverable USD Running Total]": 35494.89
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 4265.46,
+     "[Recoverable USD Running Total]": 8812.42
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 3610.07,
+     "[Recoverable USD Running Total]": 7923.53
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 2787.24,
+     "[Recoverable USD Running Total]": 6765.07
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 3560.2,
+     "[Recoverable USD Running Total]": 6851.21
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 1776.99,
+     "[Recoverable USD Running Total]": 4126.05
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-09",
+     "[Recoverable USD]": 960.69,
+     "[Recoverable USD Running Total]": 2221.75
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 43933.26,
+     "[Recoverable USD Running Total]": 135516.05
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 17548.69,
+     "[Recoverable USD Running Total]": 53043.58
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 4205.26,
+     "[Recoverable USD Running Total]": 13017.68
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 3888.13,
+     "[Recoverable USD Running Total]": 11811.66
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 5799.8,
+     "[Recoverable USD Running Total]": 12564.87
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 2394.44,
+     "[Recoverable USD Running Total]": 9245.65
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 1947.09,
+     "[Recoverable USD Running Total]": 6073.14
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-10",
+     "[Recoverable USD]": 1475.63,
+     "[Recoverable USD Running Total]": 3697.38
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 35799.18,
+     "[Recoverable USD Running Total]": 171315.23
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 16654.51,
+     "[Recoverable USD Running Total]": 69698.09
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 5013.45,
+     "[Recoverable USD Running Total]": 18031.13
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 5222.87,
+     "[Recoverable USD Running Total]": 17034.53
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 3051.27,
+     "[Recoverable USD Running Total]": 15616.14
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 2003.16,
+     "[Recoverable USD Running Total]": 11248.81
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 2244.45,
+     "[Recoverable USD Running Total]": 8317.59
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-11",
+     "[Recoverable USD]": 1181.38,
+     "[Recoverable USD Running Total]": 4878.76
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 38496.67,
+     "[Recoverable USD Running Total]": 209811.9
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 16997.27,
+     "[Recoverable USD Running Total]": 86695.36
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 3175.02,
+     "[Recoverable USD Running Total]": 21206.15
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 3861.08,
+     "[Recoverable USD Running Total]": 20895.61
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 2811.14,
+     "[Recoverable USD Running Total]": 18427.28
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 1989.17,
+     "[Recoverable USD Running Total]": 13237.98
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 2544.11,
+     "[Recoverable USD Running Total]": 10861.7
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2025-12",
+     "[Recoverable USD]": 1380.78,
+     "[Recoverable USD Running Total]": 6259.54
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 58213.07,
+     "[Recoverable USD Running Total]": 268024.97
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 17878.39,
+     "[Recoverable USD Running Total]": 104573.75
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 4577.49,
+     "[Recoverable USD Running Total]": 25783.64
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 3375.72,
+     "[Recoverable USD Running Total]": 24271.33
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 3093.06,
+     "[Recoverable USD Running Total]": 21520.34
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 2486,
+     "[Recoverable USD Running Total]": 15723.98
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 1828.35,
+     "[Recoverable USD Running Total]": 12690.05
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-01",
+     "[Recoverable USD]": 1255.54,
+     "[Recoverable USD Running Total]": 7515.08
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 38056.33,
+     "[Recoverable USD Running Total]": 306081.3
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 14775.67,
+     "[Recoverable USD Running Total]": 119349.42
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 3664.4,
+     "[Recoverable USD Running Total]": 29448.04
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 2962.9,
+     "[Recoverable USD Running Total]": 27234.23
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 3205.94,
+     "[Recoverable USD Running Total]": 24726.28
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 2138.54,
+     "[Recoverable USD Running Total]": 17862.52
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 2178.36,
+     "[Recoverable USD Running Total]": 14868.41
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-02",
+     "[Recoverable USD]": 1935.83,
+     "[Recoverable USD Running Total]": 9450.91
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 36314.06,
+     "[Recoverable USD Running Total]": 342395.36
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 17252.21,
+     "[Recoverable USD Running Total]": 136601.63
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 3879.25,
+     "[Recoverable USD Running Total]": 33327.29
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 3878.65,
+     "[Recoverable USD Running Total]": 31112.88
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 2796.73,
+     "[Recoverable USD Running Total]": 27523.01
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 2587.13,
+     "[Recoverable USD Running Total]": 20449.65
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 1522.16,
+     "[Recoverable USD Running Total]": 16390.57
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-03",
+     "[Recoverable USD]": 1416.89,
+     "[Recoverable USD Running Total]": 10867.8
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 48904.34,
+     "[Recoverable USD Running Total]": 391299.7
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 17838.3,
+     "[Recoverable USD Running Total]": 154439.93
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 3470.84,
+     "[Recoverable USD Running Total]": 36798.13
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 3854.52,
+     "[Recoverable USD Running Total]": 34967.4
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 3051.07,
+     "[Recoverable USD Running Total]": 30574.08
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 2212.34,
+     "[Recoverable USD Running Total]": 22661.99
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 1641.67,
+     "[Recoverable USD Running Total]": 18032.24
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-04",
+     "[Recoverable USD]": 1331.53,
+     "[Recoverable USD Running Total]": 12199.33
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 43596.42,
+     "[Recoverable USD Running Total]": 434896.12
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 19315.49,
+     "[Recoverable USD Running Total]": 173755.42
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 4720.97,
+     "[Recoverable USD Running Total]": 41519.1
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 4796.8,
+     "[Recoverable USD Running Total]": 39764.2
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 3246.81,
+     "[Recoverable USD Running Total]": 33820.89
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 3437.57,
+     "[Recoverable USD Running Total]": 26099.56
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 2336.49,
+     "[Recoverable USD Running Total]": 20368.73
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-05",
+     "[Recoverable USD]": 1418.73,
+     "[Recoverable USD Running Total]": 13618.06
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 41185.89,
+     "[Recoverable USD Running Total]": 476082.01
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 18146.46,
+     "[Recoverable USD Running Total]": 191901.88
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 3946.13,
+     "[Recoverable USD Running Total]": 45465.23
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 3691.92,
+     "[Recoverable USD Running Total]": 43456.12
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 3625.89,
+     "[Recoverable USD Running Total]": 37446.78
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 2088.74,
+     "[Recoverable USD Running Total]": 28188.3
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 2113.76,
+     "[Recoverable USD Running Total]": 22482.49
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-06",
+     "[Recoverable USD]": 1389.84,
+     "[Recoverable USD Running Total]": 15007.9
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 18306.27,
+     "[Recoverable USD Running Total]": 210208.15
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 3349.48,
+     "[Recoverable USD Running Total]": 48814.71
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 4389.77,
+     "[Recoverable USD Running Total]": 47845.89
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 3727.86,
+     "[Recoverable USD Running Total]": 41174.64
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 2327.77,
+     "[Recoverable USD Running Total]": 30516.07
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 1514.98,
+     "[Recoverable USD Running Total]": 23997.47
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": 1194.57,
+     "[Recoverable USD Running Total]": 16202.47
+    },
+    {
+     "Category[CategoryCode]": "FX_VARIANCE",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": 168.96,
+     "[Recoverable USD Running Total]": 48983.67
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_ASN",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 23997.47
+    },
+    {
+     "Category[CategoryCode]": "SHORTAGE",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 210208.15
+    },
+    {
+     "Category[CategoryCode]": "CHARGEBACK_LATE_SHIPMENT",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 47845.89
+    },
+    {
+     "Category[CategoryCode]": "PRICE_CLAIM",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 41174.64
+    },
+    {
+     "Category[CategoryCode]": "DUPLICATE_DEDUCTION",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 16202.47
+    },
+    {
+     "Category[CategoryCode]": "UNDERPAYMENT",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 30516.07
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-07",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 476082.01
+    },
+    {
+     "Category[CategoryCode]": "UNPAID_INVOICE",
+     "Date[Month]": "2026-08",
+     "[Recoverable USD]": null,
+     "[Recoverable USD Running Total]": 476082.01
+    }
+   ]
   }
  },
  "fingerprint": {
@@ -23309,7 +24136,8 @@
    "by_status": "d2d6ed1bc1670eb9",
    "by_vendor": "5d16d7d78ab3865e",
    "by_vendor_category": "00035852b1ded517",
-   "by_month": "b079dfbbf4fc61df"
+   "by_month": "b079dfbbf4fc61df",
+   "by_category_month": "58bb664a3ddfc9c7"
   }
  }
 }

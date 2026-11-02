@@ -92,9 +92,9 @@ def _kind(got, exp, tol: float) -> str | None:
     return None if got == exp else "value"
 
 
-def compare(suite: Suite, recorded: dict, expected: dict[str, list[dict]]) -> Report:
+def compare(suite: Suite, recorded: dict, expected: dict[str, list[dict]], slices: list | None = None) -> Report:
     report = Report(engine=recorded.get("engine"), recorded_utc=recorded.get("recorded_utc"))
-    for s in suite.slices:
+    for s in suite.slices if slices is None else slices:
         keys = [c.key for c in s.by]
         got_rows = recorded.get("queries", {}).get(s.id, {}).get("rows", [])
         got = {}

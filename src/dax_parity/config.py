@@ -74,6 +74,7 @@ class Suite:
     slices: list[Slice]
     results: Path
     data_files: list[Path] = field(default_factory=list)
+    equivalent: dict[str, str] = field(default_factory=dict)  # mutant id -> why it can't change any result
 
 
 def load(path: Path) -> Suite:
@@ -128,6 +129,12 @@ def load(path: Path) -> Suite:
     if tables and not ref.get("from") and any(not s.sql for s in slices) and not ref.get("python"):
         raise ConfigError("[reference] needs from = \"...\" (the joins the generated SQL selects from)")
 
+    equivalent = {}
+    for e in raw.get("mutate", {}).get("equivalent", []):
+        if not isinstance(e, dict) or "id" not in e or not e.get("reason"):
+            raise ConfigError('[[mutate.equivalent]] entries need id = "..." and reason = "..."')
+        equivalent[e["id"]] = e["reason"]
+
     return Suite(
         root=root,
         pbip=rel(model["pbip"]),
@@ -139,4 +146,5 @@ def load(path: Path) -> Suite:
         slices=slices,
         results=rel(raw.get("results", {}).get("path", "parity/dax_results.json")),
         data_files=sorted(tables.values()),
+        equivalent=equivalent,
     )

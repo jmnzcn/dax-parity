@@ -13,6 +13,8 @@ import subprocess
 import sys
 import tempfile
 import time
+from collections.abc import Iterator
+from contextlib import contextmanager
 from importlib import resources
 from pathlib import Path
 
@@ -49,10 +51,13 @@ def runner() -> list[str]:
     return ["dotnet", str(dll)]
 
 
-def run(*args: str, check: bool = True) -> str:
-    done = subprocess.run([*runner(), *args], capture_output=True, text=True)
+def run(*args: str, check: bool = True, progress: bool = False) -> str:
+    """Run the .NET runner. With progress, its stderr (one line per step) goes straight to the terminal."""
+    done = subprocess.run([*runner(), *args], stdout=subprocess.PIPE, stderr=None if progress else subprocess.PIPE,
+                          text=True)
     if check and done.returncode != 0:
-        raise DesktopError(f"DaxRunner {args[0]} failed:\n{done.stderr.strip() or done.stdout.strip()}")
+        detail = (done.stderr or "").strip() or done.stdout.strip()
+        raise DesktopError(f"DaxRunner {args[0]} failed:\n{detail}")
     return done.stdout
 
 
@@ -99,8 +104,10 @@ def close(title: str) -> None:
     subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True)
 
 
-def record(pbip: Path, parameters: dict[str, str], queries: list[dict], out: Path, *,
-           port: int | None = None, refresh: bool = True, keep_open: bool = False, timeout: float = 300) -> dict:
+@contextmanager
+def engine(pbip: Path, parameters: dict[str, str], *, port: int | None = None, refresh: bool = True,
+           keep_open: bool = False, timeout: float = 300) -> Iterator[tuple[int, Path]]:
+    """A Power BI Desktop engine with the model loaded and refreshed, plus a scratch folder."""
     with tempfile.TemporaryDirectory(prefix="dax-parity-") as tmp:
         tmp = Path(tmp)
         opened_here = port is None
@@ -111,13 +118,25 @@ def record(pbip: Path, parameters: dict[str, str], queries: list[dict], out: Pat
         try:
             if refresh:
                 print(run("refresh", str(port)).strip(), file=sys.stderr)
-            qfile, rfile = tmp / "queries.json", tmp / "results.json"
-            qfile.write_text(json.dumps(queries), encoding="utf-8")
-            print(run("query", str(port), str(qfile), str(rfile)).strip(), file=sys.stderr)
-            results = json.loads(rfile.read_text(encoding="utf-8"))
+            yield port, tmp
         finally:
             if opened_here and not keep_open:
                 close(pbip.stem)
                 time.sleep(2)  # let Desktop release the scratch folder before it is deleted
-    out.parent.mkdir(parents=True, exist_ok=True)
-    return results
+
+
+def record(pbip: Path, parameters: dict[str, str], queries: list[dict], **engine_args) -> dict:
+    with engine(pbip, parameters, **engine_args) as (port, tmp):
+        qfile, rfile = tmp / "queries.json", tmp / "results.json"
+        qfile.write_text(json.dumps(queries), encoding="utf-8")
+        print(run("query", str(port), str(qfile), str(rfile)).strip(), file=sys.stderr)
+        return json.loads(rfile.read_text(encoding="utf-8"))
+
+
+def mutate(pbip: Path, parameters: dict[str, str], jobs: list[dict], **engine_args) -> list[dict]:
+    """Run each job (a measure, a changed expression, the queries that can see it) and return the rows."""
+    with engine(pbip, parameters, **engine_args) as (port, tmp):
+        jfile, rfile = tmp / "mutants.json", tmp / "mutants.out.json"
+        jfile.write_text(json.dumps(jobs), encoding="utf-8")
+        run("mutate", str(port), str(jfile), str(rfile), progress=True)
+        return json.loads(rfile.read_text(encoding="utf-8"))

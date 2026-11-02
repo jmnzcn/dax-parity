@@ -1,0 +1,20 @@
+mutation score: 100%  (46 killed, 0 survived, 0 untested, 1 equivalent, 0 invalid)
+
+by measure:
+  Claims                           3 of   3 caught
+  Recoverable USD                  3 of   3 caught
+  Lost to Window USD               3 of   3 caught
+  Expected Value USD               3 of   3 caught
+  Urgent Claims                    3 of   3 caught
+  Urgent USD                       3 of   3 caught
+  Claim Rate                       2 of   2 caught
+  Share Lost to Window             4 of   4 caught
+  Avg Win Rate                     4 of   4 caught
+  Needs Review                     3 of   3 caught
+  Vendors with Claims              4 of   4 caught
+  Open Claim USD                   3 of   3 caught
+  Recoverable USD Running Total    8 of   8 caught
+
+marked equivalent in dax-parity.toml (not scored):
+  Recoverable USD Running Total: drop ALL ( 'Date' )
+      -> 'Date' is marked as a date table, so filtering 'Date'[Date] in CALCULATE already removes every other filter on 'Date'. The ALL is redundant.
