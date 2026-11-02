@@ -1,6 +1,7 @@
 # dax-parity
 
 [![ci](https://github.com/jmnzcn/dax-parity/actions/workflows/ci.yml/badge.svg)](https://github.com/jmnzcn/dax-parity/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/dax-parity)](https://pypi.org/project/dax-parity/)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB)
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue)
 
