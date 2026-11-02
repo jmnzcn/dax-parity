@@ -22,7 +22,7 @@ from dax_parity.config import Suite, _ident
 from dax_parity.reference import _scan
 
 MODEL = "claude-opus-5-5"
-PRICES = {"claude-opus-5-5": (4.0, 20.0), "claude-sonnet-5-5": (2.0, 10.0), "claude-haiku-5-5": (0.8, 4.0)}  # $/M tokens
+PRICES = {"claude-opus-5-5": (4.0, 20.0), "claude-sonnet-5-5": (2.0, 10.0), "claude-haiku-5-5": (0.10, 0.50)}  # $/M tokens
 
 SYSTEM = """\
 You write the reference implementation of one Power BI measure as a DuckDB SQL aggregate expression.
